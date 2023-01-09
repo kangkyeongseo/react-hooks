@@ -1,30 +1,23 @@
 import React from "react";
 
-const useConfirm = (message = "", onConfirm, onCancel) => {
-  if (typeof onConfirm !== "function") {
-    return;
-  }
-  if (typeof onCancel !== "function") {
-    return;
-  }
-  const confrimAction = () => {
-    if (window.confirm(message)) {
-      onConfirm();
-    } else {
-      onCancel();
-    }
+const usePreventLeave = () => {
+  const listener = (event) => {
+    event.preventDefault();
+    event.returnValue = "";
   };
-  return confrimAction;
+  const enablePrevent = () => window.addEventListener("beforeunload", listener);
+  const disablePrevent = () =>
+    window.removeEventListener("beforeunload".listener);
+  return { enablePrevent, disablePrevent };
 };
 
 const App = () => {
-  const onDelete = () => console.log("Delete");
-  const abort = () => console.log("Aborted");
-  const confirmDelete = useConfirm("Are you sure?", onDelete, abort);
+  const { enablePrevent, disablePrevent } = usePreventLeave();
   return (
     <div>
-      <h1>useConfirm</h1>
-      <button onClick={confirmDelete}>Delete</button>
+      <h1>usePreventLeave</h1>
+      <button onClick={enablePrevent}>Protect</button>
+      <button onClick={disablePrevent}>Unprotect</button>
     </div>
   );
 };
