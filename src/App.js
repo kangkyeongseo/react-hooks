@@ -1,24 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
-const useTitle = (initialTitle) => {
-  const [title, setTitle] = useState(initialTitle);
-  const updateTitle = () => {
-    const htmlTitle = document.querySelector("title");
-    htmlTitle.innerText = title;
-  };
+const useClick = (onClick) => {
+  const element = useRef();
+  if (typeof onClick !== "function") {
+    return;
+  }
   useEffect(() => {
-    updateTitle();
-  }, [title]);
-  return setTitle;
+    if (element.current) {
+      element.current.addEventListener("click", onClick);
+    }
+    return () => {
+      if (element.current) {
+        element.current.removeEventListener("click", onClick);
+      }
+    };
+  }, []);
+  return element;
 };
+
 const App = () => {
-  const updateTitle = useTitle("Loading...");
-  setTimeout(() => {
-    updateTitle("Home");
-  }, 3000);
+  const sayTitle = () => console.log("say title");
+  const title = useClick(sayTitle);
   return (
     <div>
-      <h1>useTitle</h1>
+      <h1 ref={title}>useClick</h1>
     </div>
   );
 };
